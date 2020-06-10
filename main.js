@@ -21,41 +21,51 @@ $(document).ready(function() {
                 // recupero l'elemento corrente, che corrisponde ad un oggetto
                 // questo oggetto rappresenta le vendite di un determinato venditore in una determinata data
                 var vendita_corrente = data[i];
-                console.log(vendita_corrente);
                 //con la dot notation recupero dall'oggetto i dati che mi servono per costruire i grafici
 
                 //per il grafico LINE:
                 //la data
-                var giorno = data[i].date;
-                console.log('data: ');
-                console.log(giorno);
+                var giorno_corrente = data[i].date;
+
+                //estrapolo il mese con moment
+                var mese_corrente = moment(giorno_corrente, 'DD/MM/YYYY').format('MMMM');
                 //l'importo delle vendite
                 var importo_corrente = data[i].amount;
-                console.log('euro: ');
-                console.log(importo_corrente);
 
                 //per il grafico PIE:
                 //i venditori
                 var venditore_corrente = data[i].salesman;
-                console.log('venditore: ');
-                console.log(venditore_corrente);
 
-                // verifico se l'oggetto dei venditori contiene già la chiave del venditore corrente
+
+                //verifico se l'oggetto dei venditori contiene già la chiave del venditore corrente
                 if (!venditori.hasOwnProperty(venditore_corrente)) {
                     // il venditore corrente NON è presente nell'oggetto dei venditori
                     // creo una nuova chiave con il venditore corrente
                     // e assegno il valore con la vendita corrente
                     venditori[venditore_corrente] = importo_corrente;
                 } else {
+                    //se è già presente, somma il valore della vendita corrispondente a quello già inserito
                     venditori[venditore_corrente] += importo_corrente;
                 }
 
+                // verifico se l'oggetto dei mesi contiene già la chiave del mese corrente
+                if (!mese.hasOwnProperty(mese_corrente)) {
+                    // il mese corrente NON è presente nell'oggetto dei mesi
+                    // creo una nuova chiave con il mese corrente
+                    // e assegno il valore con la vendita corrente
+                    mese[mese_corrente] = importo_corrente;
+                } else {
+                    //se è già presente, somma il valore della vendita corrispondente a quello già inserito
+                    mese[mese_corrente] += importo_corrente;
+                }
+
+
             };//fine ciclo for
 
-            console.log(venditori);
 
+            //creo una variabile con le chiavi dell'oggetto venditori => corrisponde al nome del venditore
             var chiavi = Object.keys(venditori);
-
+            //creo  una variabile con i valori dell'oggetto venditori => corrisponde all'importo delle vendite
             var valori = Object.values(venditori);
 
             //primo grafico torta
@@ -91,27 +101,50 @@ $(document).ready(function() {
                 }
             });
 
-            //Secondo grafico a linee
-            var ctx = $('#torta-venditore')[0].getContext('2d');
+            //creo una variabile con le chiavi dell'oggetto mese => corrisponde al mese in esame
+            var chiavi_line = Object.keys(mese);
+            console.log(chiavi_line);
+            //creo  una variabile con i valori dell'oggetto mese => corrisponde all'importo delle vendite per quel mese
+            var valori_line = Object.values(mese);
+            console.log(valori_line);
+
+            //Secondo grafico linea
+            var ctx = $('#linee-mese')[0].getContext('2d');
 
             var myChart = new Chart(ctx, {
-                type: 'pie',
+                type: 'line',
                 data: {
-                    labels: chiavi,
+                    labels: chiavi_line,
                     datasets: [{
-                        label: '# of Votes',
-                        data: valori,
+                        label: '€',
+                        data: valori_line,
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)',
                             'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)'
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(200, 99, 132, 0.2)',
+                            'rgba(80, 20, 235, 0.2)',
+                            'rgba(300, 50, 86, 0.2)',
+                            'rgba(255, 100, 100, 0.2)',
+                            'rgba(0, 102, 255, 0.2)',
+                            'rgba(90, 159, 64, 0.2)'
                         ],
                         borderColor: [
                             'rgba(255, 99, 132, 1)',
                             'rgba(54, 162, 235, 1)',
                             'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)'
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(200, 99, 132, 1)',
+                            'rgba(80, 20, 235, 1)',
+                            'rgba(300, 50, 86, 1)',
+                            'rgba(255, 100, 100, 1)',
+                            'rgba(0, 102, 255, 1)',
+                            'rgba(90, 159, 64, 1)'
                         ],
                         borderWidth: 1
                     }]
@@ -119,7 +152,7 @@ $(document).ready(function() {
                 options: {
                     title: {
                         display: true,
-                        text: 'Grafico delle vendite per venditore:'
+                        text: 'Grafico delle vendite per mese:'
                     }
                 }
             });
