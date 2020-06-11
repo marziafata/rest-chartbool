@@ -11,6 +11,26 @@ $(document).ready(function() {
 //creo la variabile dell'url di chiamata ajax
 var url_personale = "http://157.230.17.132:4010/sales"
 
+    // chiamata ajax POST
+    $.ajax({
+        'url': url_personale,
+        'type': 'POST',
+        'data': {
+            "salesman": "Giuseppe",
+            "amount": 3333,
+            "date": "04/12/2017"
+        },
+        'success': function (data) {
+            console.log(data);
+
+        },// fine success
+        'error': function () {
+            alert('Si è verificato un errore...');
+        }// fine error
+
+    }); //fine ajax
+
+
     //chiamata ajax
     $.ajax({
         'url': url_personale,
@@ -52,7 +72,7 @@ var url_personale = "http://157.230.17.132:4010/sales"
                 //l'importo delle vendite
                 var importo_corrente = parseInt(vendita_corrente.amount);
                 //i venditori
-                var venditore_corrente = vendita_corrente;
+                var venditore_corrente = vendita_corrente.salesman;
 
                 //LINE
                 //prendo l'oggetto[accedo alla chiave con il suo valore] e aggiungo l'importo
@@ -70,9 +90,9 @@ var url_personale = "http://157.230.17.132:4010/sales"
                     //se è già presente, somma il valore della vendita corrispondente a quello già inserito
                     venditori[venditore_corrente] += importo_corrente;
                 }//fine if pie
-                
-            };//fine ciclo for
 
+            };//fine ciclo for
+            console.log(venditori);
             //GRAFICO LINE VENDITE MENSILI
             //creo una variabile con le chiavi dell'oggetto mese => corrisponde al mese in esame
             var chiavi_line = Object.keys(mese);
@@ -113,14 +133,12 @@ var url_personale = "http://157.230.17.132:4010/sales"
                 }
             });//fine grafico line
 
-
+            //GRAFICO PIE
             //creo una variabile con le chiavi dell'oggetto venditori => corrisponde al nome del venditore
             var chiavi = Object.keys(venditori);
             //creo  una variabile con i valori dell'oggetto venditori => corrisponde all'importo delle vendite
             var valori = Object.values(venditori);
-            console.log(valori);
 
-            //primo grafico torta
             var ctx = $('#torta-venditore')[0].getContext('2d');
 
             var myChart = new Chart(ctx, {
@@ -128,7 +146,7 @@ var url_personale = "http://157.230.17.132:4010/sales"
                 data: {
                     labels: chiavi,
                     datasets: [{
-                        label: '# of Votes',
+                        label: '€',
                         data: valori,
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
@@ -148,10 +166,11 @@ var url_personale = "http://157.230.17.132:4010/sales"
                 options: {
                     title: {
                         display: true,
-                        text: 'Grafico delle vendite per venditore:'
+                        text: 'Grafico delle vendite per venditore:',
+                        fontSize: 25
                     }
                 }
-            });
+            });//fine grafico PIE
 
 
 
