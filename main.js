@@ -9,26 +9,49 @@ $(document).ready(function() {
 
 
 //creo la variabile dell'url di chiamata ajax
-var url_personale = "http://157.230.17.132:4010/sales"
+var url_personale = "http://157.230.17.132:4010/sales";
 
-    // chiamata ajax POST
-    $.ajax({
-        'url': url_personale,
-        'type': 'POST',
-        'data': {
-            "salesman": "Giuseppe",
-            "amount": 3333,
-            "date": "04/12/2017"
-        },
-        'success': function (data) {
-            console.log(data);
 
-        },// fine success
-        'error': function () {
-            alert('Si è verificato un errore...');
-        }// fine error
+        // intercetto il click sul pulsante di ricerca
+        $('.pulsante_inserisci').click(function(){
 
-    }); //fine ajax
+            //leggo la select dei nomi
+            var select_venditore = $('#salesman').val();
+            console.log(select_venditore);
+
+            //leggo la select dei mesi
+            var select_mesi = $('.months').val();
+            console.log(select_mesi);
+            var select_mesi_giusta = moment(select_mesi, 'YYYY/MM/DD').format('l');
+
+            //leggo il testo nell'input
+            var nuova_vendita = $('.testo_inserimento').val().trim();
+            console.log(nuova_vendita);
+            // resetto l'input
+            $('#testo-ricerca').val('');
+
+            var nuovo_inserimento = {
+                'salesman': select_venditore,
+                'amount': nuova_vendita,
+                'date': select_mesi_giusta
+            };
+
+            // chiamata ajax POST
+            $.ajax({
+                'url': url_personale,
+                'type': 'POST',
+                'data': nuovo_inserimento,
+                'success': function (data) {
+
+                },// fine success
+                'error': function () {
+                    alert('Si è verificato un errore...');
+                }// fine error
+
+            }); //fine ajax
+
+        });
+
 
 
     //chiamata ajax
@@ -60,6 +83,7 @@ var url_personale = "http://157.230.17.132:4010/sales"
             for (var i = 0; i < data.length; i++) {
                 //mi estraggo un oggetto alla volta
                 var vendita_corrente = data[i];
+
                 //con la dot notation recupero dall'oggetto i dati che mi servono per costruire i grafici
 
                 //estrapolo le informazioni:
@@ -71,8 +95,10 @@ var url_personale = "http://157.230.17.132:4010/sales"
                 var mese_corrente = moment(giorno_corrente, 'DD/MM/YYYY').format('MMMM');
                 //l'importo delle vendite
                 var importo_corrente = parseInt(vendita_corrente.amount);
+
                 //i venditori
                 var venditore_corrente = vendita_corrente.salesman;
+
 
                 //LINE
                 //prendo l'oggetto[accedo alla chiave con il suo valore] e aggiungo l'importo
@@ -92,7 +118,8 @@ var url_personale = "http://157.230.17.132:4010/sales"
                 }//fine if pie
 
             };//fine ciclo for
-            console.log(venditori);
+
+    
             //GRAFICO LINE VENDITE MENSILI
             //creo una variabile con le chiavi dell'oggetto mese => corrisponde al mese in esame
             var chiavi_line = Object.keys(mese);
