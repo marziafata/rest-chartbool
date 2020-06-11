@@ -33,6 +33,7 @@ var url_personale = "http://157.230.17.132:4010/sales"
                 'dicembre': 0
             };//fine oggetto mese
 
+            //creo un oggetto vuoto dove andare a inserire i venditori
             var venditori = {};
 
             //ciclo data per tirarmi fuori gli elementi che mi servono. In questo caso l'API mi restituisce un array di oggetti che posso ciclare per tirare fuori i singoli oggetti su cui applicare la dot.notation per ottenere gli elementi che mi servono, MA! non è sempre valido. Ogni API è diverso, prima guardare sempre cosa contiene l'API per valutare come tirare fuori i dati in base a come è costruito => non c'è una regola! Dipende da come è costruita l'API.
@@ -51,7 +52,7 @@ var url_personale = "http://157.230.17.132:4010/sales"
                 //l'importo delle vendite
                 var importo_corrente = parseInt(vendita_corrente.amount);
                 //i venditori
-                var venditore_corrente = vendita_corrente.salesman;
+                var venditore_corrente = vendita_corrente;
 
                 //LINE
                 //prendo l'oggetto[accedo alla chiave con il suo valore] e aggiungo l'importo
@@ -68,7 +69,8 @@ var url_personale = "http://157.230.17.132:4010/sales"
                 } else {
                     //se è già presente, somma il valore della vendita corrispondente a quello già inserito
                     venditori[venditore_corrente] += importo_corrente;
-                }
+                }//fine if pie
+                
             };//fine ciclo for
 
             //GRAFICO LINE VENDITE MENSILI
@@ -87,10 +89,12 @@ var url_personale = "http://157.230.17.132:4010/sales"
                     datasets: [{
                         label: '€',
                         data: valori_line,
-                        pointBackgroundColor: 'rgba(255, 99, 132, 1)',
-                        borderColor: 'rgba(0, 0, 0, 0,5)',
+                        pointBorderColor: 'rgba(255, 99, 132, 1)',
+                        pointBackgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        pointBorderWidth: 1,
+                        borderColor: 'rgba(0, 0, 0, 0,7)',
                         fill: false,
-                        borderWidth: 2
+                        borderWidth: 3
                     }]
                 },
                 options: {
