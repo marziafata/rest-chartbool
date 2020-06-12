@@ -5,6 +5,8 @@ $(document).ready(function() {
     //importo moment in tutte le lingue (url locales in html) per avere i mesi in italiano
     moment.locale('it');
 
+    disegna_grafici();
+
     // intercetto il click sul pulsante di ricerca
     $('.pulsante_inserisci').click(function(){
         //leggo i valori delle select e dell'input
@@ -26,6 +28,8 @@ $(document).ready(function() {
             'data': nuovo_inserimento,
             'success': function (data) {
 
+                disegna_grafici();
+
             },// fine success
             'error': function () {
                 alert('Si è verificato un errore...');
@@ -36,68 +40,43 @@ $(document).ready(function() {
     });//fine click
 
 
-    //chiamata ajax
-    $.ajax({
-        'url': url_personale,
-        'method': 'GET',
-        'success': function (data) { // + log dei dati (data) da fare sempre quando iniziamo => vediamo cosa arriva dall'API
 
-            //GRAFICO LINE VENDITE MENSILI
-            //salvo in una variabile l'oggetto che contiene i mesi con i valori delle vendite mensili
-            var dati_mensili = oggetto_dati_vendite_mensili(data);
-            //creo una variabile con le chiavi dell'oggetto (i mesi), che saranno le etichette del grafico
-            var chiavi_line = Object.keys(dati_mensili);
-            //creo una variabile con i valori che saranno i dati del grafico
-            var valori_line = Object.values(dati_mensili);
-            //disegno il grafico passandogli i parametri delle etichette e dei dati
-            disegna_linee(chiavi_line, valori_line)
+    //creo una funzione della chiamata ajax che estrapola i dati e disegna i grafici
+    function disegna_grafici() {
+        //chiamata ajax
+        $.ajax({
+            'url': url_personale,
+            'method': 'GET',
+            'success': function (data) { // + log dei dati (data) da fare sempre quando iniziamo => vediamo cosa arriva dall'API
 
+                //GRAFICO LINE VENDITE MENSILI
+                //salvo in una variabile l'oggetto che contiene i mesi con i valori delle vendite mensili (restituito dalla funzione)
+                var dati_mensili = oggetto_dati_vendite_mensili(data);
+                //creo una variabile con le chiavi dell'oggetto (i mesi), che saranno le etichette del grafico
+                var chiavi_line = Object.keys(dati_mensili);
+                //creo una variabile con i valori che saranno i dati del grafico
+                var valori_line = Object.values(dati_mensili);
+                //disegno il grafico passandogli i parametri delle etichette e dei dati
+                disegna_linee(chiavi_line, valori_line)
 
-            function oggetto_vendite_venditori(dati) {
+                //GRAFICO PIE
+                //salvo in una variabile l'oggetto che contiene i venditori con le loro vendite (restituito dalla fuunzione)
+                var dati_venditori = oggetto_vendite_venditori(data);
+                //creo una variabile con le chiavi dell'oggetto (i venditori), che saranno le etichette del grafico
+                var chiavi = Object.keys(dati_venditori);
+                //creo una variabile con i valori che saranno i dati del grafico
+                var valori = Object.values(dati_venditori);
+                //disegno il grafico passandogli i parametri delle etichette e dei dati
+                disegna_torta(chiavi, valori);
 
-                //creo un oggetto vuoto dove andare a inserire i venditori e le vendite corrispondenti
-                var venditori = {};
+            },// fine success
+            'error': function () {
+                alert('Si è verificato un errore...');
+            }// fine error
 
-                for (var i = 0; i < dati.length; i++) {
-                    //tecupero la vendita corrente
-                    var vendita_corrente = dati[i];
-                    //con la dot notation recupero l'importo delle vendite
-                    var importo_corrente = parseInt(vendita_corrente.amount);
-                    //recupero i nomi dei venditori
-                    var venditore_corrente = vendita_corrente.salesman;
-                    //verifico se l'oggetto dei venditori contiene già la chiave del venditore corrente
-                    if (!venditori.hasOwnProperty(venditore_corrente)) {
-                        // il venditore corrente NON è presente nell'oggetto dei venditori
-                        // creo una nuova chiave con il venditore corrente
-                        // e assegno il valore con la vendita corrente
-                        //prendo l'oggetto[creo la chiave con il nome corrente] = assegno il valore
-                        venditori[venditore_corrente] = importo_corrente;
-                    } else {
-                        
-                        venditori[venditore_corrente] += importo_corrente;
-                    }//fine if pie
+        }); //fine ajax
+    }// fine funzione disegna grafici
 
-                };//fine ciclo for
-
-            }//fine funzione dati vendite venditori
-
-            //GRAFICO PIE
-            //creo una variabile con le chiavi dell'oggetto venditori => corrisponde al nome del venditore
-            var chiavi = Object.keys(venditori);
-            //creo  una variabile con i valori dell'oggetto venditori => corrisponde all'importo delle vendite
-            var valori = Object.values(venditori);
-
-            disegna_torta(chiavi, valori);
-
-
-
-
-        },// fine success
-        'error': function () {
-            alert('Si è verificato un errore...');
-        }// fine error
-
-    }); //fine ajax
 
     function oggetto_dati_vendite_mensili(dati) {
         //creo un oggetto con i mesi: posso scriverlo a mano perchè i mesi sono 12 e non cambiano, oppure farli scrivere a moment
@@ -132,6 +111,35 @@ $(document).ready(function() {
         }//fine ciclo for
         return mese;
     }//fine funzione oggetto dati vendite mensili
+
+    function oggetto_vendite_venditori(dati) {
+
+        //creo un oggetto vuoto dove andare a inserire i venditori e le vendite corrispondenti
+        var venditori = {};
+
+        for (var i = 0; i < dati.length; i++) {
+            //tecupero la vendita corrente
+            var vendita_corrente = dati[i];
+            //con la dot notation recupero l'importo delle vendite
+            var importo_corrente = parseInt(vendita_corrente.amount);
+            //recupero i nomi dei venditori
+            var venditore_corrente = vendita_corrente.salesman;
+            //verifico se l'oggetto dei venditori contiene già la chiave del venditore corrente
+            if (!venditori.hasOwnProperty(venditore_corrente)) {
+                // il venditore corrente NON è presente nell'oggetto dei venditori
+                // creo una nuova chiave con il venditore corrente
+                // e assegno il valore con la vendita corrente
+                //prendo l'oggetto[creo la chiave con il nome corrente] = assegno il valore
+                venditori[venditore_corrente] = importo_corrente;
+            } else {
+                //prendo l'oggetto[leggo la chiave con il nome corrente] = sommo il valore a quello già presente
+                venditori[venditore_corrente] += importo_corrente;
+            }//fine if vendite venditori (pie)
+
+        };//fine ciclo for
+        return venditori;
+
+    }//fine funzione dati vendite venditori
 
     //funzione per creare il grafico torta
     function disegna_torta(etichette, dati) {
