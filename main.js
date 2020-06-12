@@ -116,6 +116,7 @@ $(document).ready(function() {
 
         //creo un oggetto vuoto dove andare a inserire i venditori e le vendite corrispondenti
         var venditori = {};
+        var totale_vendite = 0;
 
         for (var i = 0; i < dati.length; i++) {
             //tecupero la vendita corrente
@@ -136,7 +137,22 @@ $(document).ready(function() {
                 venditori[venditore_corrente] += importo_corrente;
             }//fine if vendite venditori (pie)
 
+            //calcolo il totale delle vendite che mi serve per il calcolo delle percentuali
+            totale_vendite += importo_corrente;
+
         };//fine ciclo for
+
+        //TRASFORMARE TUTTI I VALORI IN PERCENTUALI
+        //ciclo l'oggetto
+        for (var nome_venditore in venditori) {
+            //recupero l'importo totale di questo venditore: dall'oggetto venditori accedo al valore della [chiave]
+            var importo_venditore = venditori[nome_venditore];
+            //calcolo la percentuale delle sue vendite sul totale e applico tofixed per avere solo un numero dopo la virgola
+            var percentuale = (importo_venditore * 100 / totale_vendite).toFixed(1);
+            //imposto la percentuale come valori_line
+            venditori[nome_venditore] = percentuale;
+        }
+
         return venditori;
 
     }//fine funzione dati vendite venditori
@@ -179,6 +195,7 @@ $(document).ready(function() {
 
     //funzione per disegnare il grafico linee
     function disegna_linee(etichette, dati) {
+
         var ctx = $('#linee-mese')[0].getContext('2d');
 
         var myChart = new Chart(ctx, {
