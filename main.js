@@ -73,7 +73,7 @@ $(document).ready(function() {
                         //prendo l'oggetto[creo la chiave con il nome corrente] = assegno il valore
                         venditori[venditore_corrente] = importo_corrente;
                     } else {
-                        //se è già presente, somma il valore della vendita corrispondente a quello già inserito
+                        
                         venditori[venditore_corrente] += importo_corrente;
                     }//fine if pie
 
