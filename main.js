@@ -70,7 +70,7 @@ $(document).ready(function() {
                         // il venditore corrente NON è presente nell'oggetto dei venditori
                         // creo una nuova chiave con il venditore corrente
                         // e assegno il valore con la vendita corrente
-                        //prendo l'oggetto[creo la chiave con il nome corrente] = assegno il valore 
+                        //prendo l'oggetto[creo la chiave con il nome corrente] = assegno il valore
                         venditori[venditore_corrente] = importo_corrente;
                     } else {
                         //se è già presente, somma il valore della vendita corrispondente a quello già inserito
