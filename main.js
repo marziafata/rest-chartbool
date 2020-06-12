@@ -5,22 +5,28 @@ $(document).ready(function() {
     //importo moment in tutte le lingue (url locales in html) per avere i mesi in italiano
     moment.locale('it');
 
-    disegna_grafici();
+    // variabili globali dei grafici per poter gestire gli aggiornamenti
+    var grafico_linee;
+    var grafico_torta;
+
+    disegna_grafici(false);
 
     // intercetto il click sul pulsante di ricerca
     $('.pulsante_inserisci').click(function(){
         //leggo i valori delle select e dell'input
         var select_venditore = $('#salesman').val();
         var select_mesi = $('.months').val();
-        var nuova_vendita = $('.testo_inserimento').val().trim();
+        var nuova_vendita = $('.testo_inserimento').val();
         //trasformo la data nel formato corretto
         var select_mesi_giusta = moment(select_mesi, 'YYYY/MM/DD').format('l');
+
         //creo una variabile con i dati dell'oggetto recuperati
         var nuovo_inserimento = {
             'salesman': select_venditore,
             'amount': nuova_vendita,
             'date': select_mesi_giusta
         };
+
         // chiamata ajax POST
         $.ajax({
             'url': url_personale,
@@ -28,21 +34,22 @@ $(document).ready(function() {
             'data': nuovo_inserimento,
             'success': function (data) {
 
-                disegna_grafici();
-
-            },// fine success
-            'error': function () {
+                disegna_grafici(true);
+            },
+            'error': function() {
                 alert('Si è verificato un errore...');
             }// fine error
-
-        }); //fine ajax
+        });//fine ajax
 
     });//fine click
 
 
-
+    // funzione per recuperare i dati e disegnare i grafici
+    // riceve come parametro una variabile booleana:
+    // se aggiorna == true, significa che i grafici sono già stati disegnati e bisogna solo aggiornarli
+    // se aggiorna == false, significa che i grafici non sono ancora stati disegnati
     //creo una funzione della chiamata ajax che estrapola i dati e disegna i grafici
-    function disegna_grafici() {
+    function disegna_grafici(aggiorna) {
         //chiamata ajax
         $.ajax({
             'url': url_personale,
@@ -56,8 +63,18 @@ $(document).ready(function() {
                 var chiavi_line = Object.keys(dati_mensili);
                 //creo una variabile con i valori che saranno i dati del grafico
                 var valori_line = Object.values(dati_mensili);
-                //disegno il grafico passandogli i parametri delle etichette e dei dati
-                disegna_linee(chiavi_line, valori_line)
+
+                if(!aggiorna) {
+                    //disegno per la prima volta il grafico
+                    //disegno il grafico passandogli i parametri delle etichette e dei dati
+                    disegna_linee(chiavi_line, valori_line);
+                } else {
+                    //aggiorno il grafico
+                    //modifico i dati del grafico impostando l'array con i dati aggiornati
+                    grafico_linee.config.data.datasets[0].data = valori_line;
+                    grafico_linee.update();
+                }//fine if
+
 
                 //GRAFICO PIE
                 //salvo in una variabile l'oggetto che contiene i venditori con le loro vendite (restituito dalla fuunzione)
@@ -66,8 +83,18 @@ $(document).ready(function() {
                 var chiavi = Object.keys(dati_venditori);
                 //creo una variabile con i valori che saranno i dati del grafico
                 var valori = Object.values(dati_venditori);
-                //disegno il grafico passandogli i parametri delle etichette e dei dati
-                disegna_torta(chiavi, valori);
+
+                if(!aggiorna) {
+                    //disegno per la prima volta il grafico
+                    //disegno il grafico passandogli i parametri delle etichette e dei dati
+                    disegna_torta(chiavi, valori);
+                } else {
+                    //aggiorno il grafico
+                    //modifico i dati del grafico impostando l'array con i dati aggiornati
+                    grafico_torta.config.data.datasets[0].data = valori;
+                    grafico_torta.update();
+                }//fine if
+
 
             },// fine success
             'error': function () {
@@ -161,7 +188,7 @@ $(document).ready(function() {
     function disegna_torta(etichette, dati) {
         var ctx = $('#torta-venditore')[0].getContext('2d');
 
-        var myChart = new Chart(ctx, {
+        grafico_torta = new Chart(ctx, {
             type: 'pie',
             data: {
                 labels: etichette,
@@ -198,7 +225,7 @@ $(document).ready(function() {
 
         var ctx = $('#linee-mese')[0].getContext('2d');
 
-        var myChart = new Chart(ctx, {
+        grafico_linee = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: etichette,
