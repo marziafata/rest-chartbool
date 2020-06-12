@@ -10,15 +10,18 @@
     <body>
 
         <div class="chart-container">
-            <canvas id="torta-venditore"></canvas>
+            <div class="grafico-wrap">
+                <canvas id="torta-venditore"></canvas>
+            </div>
             <label for="salesman">Seleziona un venditore:</label>
             <select name="salesman" id="salesman">
+              <option value="">-- Scegli venditore: --</option>
               <option value="Marco">Marco</option>
               <option value="Giuseppe">Giuseppe</option>
               <option value="Roberto">Roberto</option>
               <option value="Riccardo">Riccardo</option>
             </select>
-            <label for="months">Seleziona un mese:</label>
+            <label for="months">Seleziona un giorno:</label>
             <input class="months" type="date">
             <!-- <select name="months" class="months">
               <option value="gennaio">gennaio</option>
@@ -38,7 +41,9 @@
             <button class="pulsante_inserisci" type="button" name="button">Inserisci</button>
         </div>
         <div class="chart-container">
-            <canvas id="linee-mese"></canvas>
+            <div class="grafico-wrap">
+                <canvas id="linee-mese"></canvas>
+            </div>
         </div>
 
 <!-- Script chart.js -->

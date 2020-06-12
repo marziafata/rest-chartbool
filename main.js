@@ -1,58 +1,50 @@
 $(document).ready(function() {
 
-// Utilizziamo la libreria chart.js per creare dei bellissimi grafici che mostreranno dei dati aggregati
-// Fate una chiamata ajax per recuperare la lista di vendite fatte dai venditori di un'azienda nel 2017
-// http://157.230.17.132:4010/sales
-// Con questi dati create:
-// un grafico a linee per rappresentare le vendite di ogni mese (occhio alla gestione dei colori)
-// un grafico a torta per rappresentare le vendite di ogni venditore
+    //creo la variabile dell'url di chiamata ajax
+    var url_personale = "http://157.230.17.132:4010/sales";
+
+    chiamata_ajax();
+
+    // intercetto il click sul pulsante di ricerca
+    $('.pulsante_inserisci').click(function(){
+        //leggo i dati inseriti dall'utente
+        //leggo la select dei nomi
+        var select_venditore = $('#salesman').val();
+
+        //leggo la select dei mesi
+        var select_mesi = $('.months').val();
+        //trasformo la data nel formato corretto richiesto dall'oggetto
+        var select_mesi_giusta = moment(select_mesi, 'YYYY/MM/DD').format('l');
+
+        //leggo il testo nell'input
+        var nuova_vendita = $('.testo_inserimento').val().trim();
 
 
-//creo la variabile dell'url di chiamata ajax
-var url_personale = "http://157.230.17.132:4010/sales";
+
+        var nuovo_inserimento = {
+            'salesman': select_venditore,
+            'amount': nuova_vendita,
+            'date': select_mesi_giusta
+        };
+
+        // chiamata ajax POST
+        $.ajax({
+            'url': url_personale,
+            'type': 'POST',
+            'data': nuovo_inserimento,
+            'success': function (data) {
+                chiamata_ajax();
+            },// fine success
+            'error': function () {
+                alert('Si è verificato un errore...');
+            }// fine error
+
+        }); //fine ajax
+
+    });//fine click
 
 
-        // intercetto il click sul pulsante di ricerca
-        $('.pulsante_inserisci').click(function(){
-
-            //leggo la select dei nomi
-            var select_venditore = $('#salesman').val();
-            console.log(select_venditore);
-
-            //leggo la select dei mesi
-            var select_mesi = $('.months').val();
-            console.log(select_mesi);
-            var select_mesi_giusta = moment(select_mesi, 'YYYY/MM/DD').format('l');
-
-            //leggo il testo nell'input
-            var nuova_vendita = $('.testo_inserimento').val().trim();
-            console.log(nuova_vendita);
-            // resetto l'input
-            $('#testo-ricerca').val('');
-
-            var nuovo_inserimento = {
-                'salesman': select_venditore,
-                'amount': nuova_vendita,
-                'date': select_mesi_giusta
-            };
-
-            // chiamata ajax POST
-            $.ajax({
-                'url': url_personale,
-                'type': 'POST',
-                'data': nuovo_inserimento,
-                'success': function (data) {
-
-                },// fine success
-                'error': function () {
-                    alert('Si è verificato un errore...');
-                }// fine error
-
-            }); //fine ajax
-
-        });
-
-
+    function chiamata_ajax() {
 
     //chiamata ajax
     $.ajax({
@@ -119,7 +111,6 @@ var url_personale = "http://157.230.17.132:4010/sales";
 
             };//fine ciclo for
 
-    
             //GRAFICO LINE VENDITE MENSILI
             //creo una variabile con le chiavi dell'oggetto mese => corrisponde al mese in esame
             var chiavi_line = Object.keys(mese);
@@ -199,13 +190,13 @@ var url_personale = "http://157.230.17.132:4010/sales";
                 }
             });//fine grafico PIE
 
-
-
         },// fine success
         'error': function () {
             alert('Si è verificato un errore...');
         }// fine error
 
     }); //fine ajax
+
+    };//fine funzione chiamata ajax
 
 });//fine document ready
